@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   fdf.h                                              :+:      :+:    :+:   */
+/*   wolf3d.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: flagoutt <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2014/12/03 19:15:12 by flagoutt          #+#    #+#             */
-/*   Updated: 2015/05/27 16:33:47 by flagoutt         ###   ########.fr       */
+/*   Created: 2015/06/02 20:01:25 by flagoutt          #+#    #+#             */
+/*   Updated: 2015/06/08 13:25:12 by flagoutt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef FDF_H
-# define FDF_H
+#ifndef WOLF3D_H
+# define WOLF3D_H
 # define PI 3.141592
 # define WIDTH 800
 # define HEIGHT 600
@@ -24,22 +24,29 @@
 /*
 **  Common parameters
 */
-# define FOV 60.
+# define FOV 70.
 # define BLOCKSIZE 64.
 # define MAX_DISTANCE 100000
-# define WALL_HEIGHT 10
+# define WALL_HEIGHT 20
+# define JUMP_HEIGHT 50
 /*
 **  In game Colors
 */
 # define SKYCOLOR 0x0000eeff
-# define FLOORCOLOR 0x00058700
+# define WALLNORTHCOLOR 0x00ffcc00
+# define WALLSOUTHCOLOR 0x00ff99ff
+# define WALLEASTCOLOR 0x00ccff33
+# define WALLWESTCOLOR 0x0000ffcc
+# define FLOORCOLOR 0x0005870
 /*
 **	Define your own keys
 */
 # define ESCAPE 53
 # define PAUSE 50
-# define SHOOT 1
-# define POWER 2
+# define SHOOT 258
+# define POWER 82
+# define CROUCH 8
+# define JUMP 49
 # define SPRINT 257
 # define FORWARD 126
 # define DOWNWARD 125
@@ -47,11 +54,12 @@
 # define STRAFERIGHT 124
 # define TURNLEFT 0
 # define TURNRIGHT 2
+# define KEY_T 17
 /*
 **  In game movement speeds
 */
 # define MOVESPEED 2
-# define ROTSPEED 1
+# define ROTSPEED 2
 
 /*
 ** Ajout des booleens, substitue par des chars
@@ -63,8 +71,8 @@ typedef char	bool;
 */
 typedef struct		s_ipoint
 {
-	int				x;
-	int				y;
+	double			x;
+	double			y;
 	int				color;
 }					t_ipoint;
 
@@ -100,6 +108,7 @@ typedef struct		s_grid
 */
 typedef struct		s_hooks
 {
+	bool			textured;
 	bool			shooting;
 	bool			powering;
 	bool			forward;
@@ -108,6 +117,8 @@ typedef struct		s_hooks
 	bool			straferight;
 	bool			camleft;
 	bool			camright;
+	bool			crouch;
+	bool			jumping;
 }					t_hooks;
 
 /*
@@ -115,18 +126,21 @@ typedef struct		s_hooks
 */
 typedef struct		s_textures
 {
-	t_img			wall1;
-	t_img			wall2;
-	t_img			wall3;
-	t_img			wall4;
+	t_img			stone;
+	t_img			wood;
+	t_img			planks;
+	t_img			dirt;
+	t_img			wool;
 	t_img			hell;
 	t_img			sky;
 	t_img			floor;
 	t_img			grass;
+	t_img			flower_rose;
+	t_img			bush;
+	t_img			glowstone;
 	t_img			weapon;
 	t_img			weaponfiring;
-	t_img			key;
-}					textures;
+}					t_textures;
 
 /*
 ** Textures structure to print
@@ -150,18 +164,31 @@ typedef struct		s_minimap
 }					t_minimap;
 
 /*
-**  
+**  Ray params
 */
 typedef struct		s_rayparams
 {
-    int   horizontal_x;
-    int   horizontal_y;
-    int   horizontal_stepx;
-    int   horizontal_stepy;
-    int   vertical_x;
-    int   vertical_y;
-    int   vertical_stepx;
-    int   vertical_stepy;
+	double	angle;
+    double  horizontal_x;
+    double  horizontal_y;
+    double  horizontal_stepx;
+    double  horizontal_stepy;
+    double  horizontal_hit_dist;
+    double  horizontal_object_x;
+    double  horizontal_object_dist;
+    double  vertical_x;
+    double  vertical_y;
+    double  vertical_stepx;
+    double  vertical_stepy;
+    double  vertical_hit_dist;
+    double  vertical_object_y;
+    double  vertical_object_dist;
+	double	wallheight;
+	double	objheight;
+	int		walloffset;
+	int		objoffset;
+	int		blocktype;
+	int		objectype;
 }					t_rayparams;
 
 /*
@@ -171,6 +198,8 @@ typedef struct		s_mlxdata
 {
 	t_env			env;
 	t_ipoint		playerpos;
+	int				playerheight;
+	int				score;
 	t_ipoint		target;
 	t_ipoint		a;
 	t_ipoint		b;
@@ -185,13 +214,8 @@ typedef struct		s_mlxdata
 	t_hooks			hooks;
 	int				skycolor;
 	int				floorcolor;
-	int				camdist;
-	textures		txtures;
-	int				tab_128sin[90];
-	int				tab_div_128tan[90];
-	int				tab_128tan[90];
-	int				tab_div_128sin[90];
-}					t_mlxdata;
+	t_textures		txtures;
+}			t_mlxdata;
 
 int					mlx_putline(t_mlxdata *data, t_ipoint a, t_ipoint b);
 void				swap_points(t_ipoint *a, t_ipoint *b);
@@ -214,7 +238,19 @@ t_img				mlx_create_image(t_mlxdata *data,
 int					mlx_putpxl_img(t_img img, int x, int y, int color);
 int		            wolf_view(t_mlxdata *data);
 int					wolf_move(t_mlxdata *data, int direction);
-int					mlx_img_cpy(t_mlxdata *data, t_img img1, t_img img2, t_ipoint a, t_ipoint b);
 int					mlx_getpxl_img(int x, int y, t_img img);
-t_rayparams			setup_intersections_params(t_mlxdata *data, int angle);
+void				setup_intersections_params(t_mlxdata *data, t_rayparams *ray);
+double				walldist(t_mlxdata *data, t_rayparams *ray, int *horizcloser);
+int				    verti_walldist(t_mlxdata *data, t_rayparams *ray,
+								int *vobjectype);
+int			       horiz_walldist(t_mlxdata *data, t_rayparams *ray,
+								int *hobjectype);
+int					load_txtures(t_mlxdata *data);
+int					mlx_getpxl_img(int x, int y, t_img img);
+void				textured(t_mlxdata *data, int x, t_rayparams *ray);
+int					wolf_putweapon(t_mlxdata *data);
+int					wolf_controller(t_mlxdata *data);
+t_img				gettextures(t_mlxdata *data, int type);
+
+
 #endif

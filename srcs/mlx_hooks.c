@@ -6,37 +6,19 @@
 /*   By: flagoutt <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/01/15 23:00:30 by flagoutt          #+#    #+#             */
-/*   Updated: 2015/05/27 16:14:32 by flagoutt         ###   ########.fr       */
+/*   Updated: 2015/06/08 14:26:46 by flagoutt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf3d.h"
 #include <stdio.h>
 
-int		mouse_hook2(int button, int x, int y, t_mlxdata *data)
+void		key_hkmove(int keycode, t_mlxdata *data)
 {
-	(void)x;
-	(void)y;
-	if (button == 5)
-		(void)data;
-	return (1);
-}
-
-int		mouse_hook(int button, int x, int y, t_mlxdata *data)
-{
-	(void)x;
-	(void)y;
-	if (button == 4)
-		(void)data;
-	mouse_hook2(button, x, y, data);
-	printf("\n Mouse button pressed : %i", button);
-	return (1);
-}
-
-void	key_hkmove(int keycode, t_mlxdata *data)
-{
+	if (keycode == KEY_T)
+		data->hooks.textured = (data->hooks.textured) ? 0 : 1;
 	if (keycode == SPRINT)
-		data->mvspeed = MOVESPEED;
+		data->mvspeed -= MOVESPEED;
 	if (keycode == FORWARD)
 		data->hooks.forward = 0;
 	if (keycode == DOWNWARD)
@@ -51,9 +33,8 @@ void	key_hkmove(int keycode, t_mlxdata *data)
 		data->hooks.camright = 0;
 }
 
-int		key_hook(int keycode, t_mlxdata *data)
+int			key_hook(int keycode, t_mlxdata *data)
 {
-	printf("\n Key pressed : %i", keycode);
 	key_hkmove(keycode, data);
 	if (keycode == PAUSE)
 		usleep(10000000);
@@ -61,17 +42,35 @@ int		key_hook(int keycode, t_mlxdata *data)
 		data->hooks.shooting = 0;
 	if (keycode == POWER)
 		data->hooks.powering = 0;
+	if (keycode == CROUCH && data->hooks.crouch)
+	{
+		data->playerheight += HEIGHT / 10;
+		data->hooks.crouch = 0;
+		data->mvspeed += MOVESPEED / 2;
+	}
 	if (keycode == ESCAPE)
 		exit(0);
 	return (1);
 }
 
-int keypress_hook(int keycode, t_mlxdata *data)
+static void	keypress_norm(int keycode, t_mlxdata *data)
 {
-	printf("\nHallelujah\n");
-//	if (keycode == SHOOT)
-//		usleep(1000000);
-//		data->hooks.shooting = 1;
+	if (keycode == TURNRIGHT)
+		data->hooks.camright = 1;
+	if (keycode == CROUCH && data->hooks.crouch == 0)
+	{
+		data->mvspeed -= MOVESPEED / 2;
+		data->playerheight -= HEIGHT / 10;
+		data->hooks.crouch = 1;
+	}
+	if (keycode == JUMP)
+		data->hooks.jumping = 1;
+}
+
+int			keypress_hook(int keycode, t_mlxdata *data)
+{
+	if (keycode == SHOOT)
+		data->hooks.shooting = 1;
 	if (keycode == POWER)
 		data->hooks.powering = 1;
 	if (keycode == FORWARD)
@@ -83,10 +82,9 @@ int keypress_hook(int keycode, t_mlxdata *data)
 	if (keycode == STRAFERIGHT)
 		data->hooks.straferight = 1;
 	if (keycode == SPRINT)
-		data->mvspeed = MOVESPEED * 2;
+		data->mvspeed += MOVESPEED;
 	if (keycode == TURNLEFT)
 		data->hooks.camleft = 1;
-	if (keycode == TURNRIGHT)
-		data->hooks.camright = 1;
+	keypress_norm(keycode, data);
 	return (0);
 }

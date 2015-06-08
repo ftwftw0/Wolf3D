@@ -6,175 +6,108 @@
 /*   By: flagoutt <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/03/08 19:06:47 by flagoutt          #+#    #+#             */
-/*   Updated: 2015/05/27 15:56:59 by flagoutt         ###   ########.fr       */
+/*   Updated: 2015/06/02 22:23:28 by flagoutt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "wolf3d.h"
 
-//=====================================================================
-// angle 0 to 89 degrees - parameter setup ...
-//=====================================================================
-t_rayparams setup90(t_mlxdata *data, int angle)
+static void	setup90(t_mlxdata *data, t_rayparams *ray)
 {
-	t_rayparams ray;
-	long		first_hit;  // temporary variable
+	double		first_hit;
 
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with horizontal lines
-	//-----------------------------------------------------------------
-	ray.horizontal_y = (data->playerpos.y & 0xffc0) - 1;
-	first_hit = (long)(data->tab_div_128tan[angle] * 2); // 256/tan(angle)
-	first_hit *= -(long)(ray.horizontal_y - data->playerpos.y);
-	first_hit >>= 8;
-	first_hit += (long)data->playerpos.x;
-	ray.horizontal_x = (short)first_hit;
-	printf("ray.horizontal = (%i, %i)\n", ray.horizontal_x, ray.horizontal_y);
-	ray.horizontal_stepx = data->tab_div_128tan[angle] / 2.;  // 64/tan(angle)
-	ray.horizontal_stepy = -64;
-	printf(" + ray.horizontal_step = (%i, %i)\n", ray.horizontal_stepx, ray.horizontal_stepy);
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with vertical lines
-	//-----------------------------------------------------------------
-	ray.vertical_x  = (data->playerpos.x & 0xffc0) + 64;
-	first_hit   = (long)(data->tab_128tan[angle] * 2); // 256*tan(angle)
-	first_hit  *= -(long)(ray.vertical_x - data->playerpos.x);
-	first_hit   >>= 8;
-	first_hit  += (long)data->playerpos.y;
-	ray.vertical_y = (short)first_hit;
-	printf("ray.vertical = (%i, %i)\n", ray.vertical_x, ray.vertical_y);
-	ray.vertical_stepx = 64;
-	ray.vertical_stepy = -(data->tab_128tan[angle] / 2.); // 64*tan(angle)
-	printf(" + ray.vertical_step = (%i, %i)\n", ray.vertical_stepx, ray.vertical_stepy);
-	return (ray);
+	ray->horizontal_y = ((int)data->playerpos.y & 0xffc0) - 0.01;
+	first_hit = -256. / tan(ray->angle * PI / 180);
+	first_hit *= (double)(ray->horizontal_y - data->playerpos.y);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.x;
+	ray->horizontal_x = (double)first_hit;
+	ray->horizontal_stepx = 64 / tan(ray->angle * PI / 180);
+	ray->horizontal_stepy = -64;
+	ray->vertical_x = ((int)data->playerpos.x & 0xffc0) + 64;
+	first_hit = -256. * tan(ray->angle * PI / 180);
+	first_hit *= (double)(ray->vertical_x - data->playerpos.x);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.y;
+	ray->vertical_y = (double)first_hit;
+	ray->vertical_stepx = 64;
+	ray->vertical_stepy = -64. * tan(ray->angle * PI / 180);
 }
 
-//=====================================================================
-// angle 90 to 179 degrees - parameter setup ...
-//=====================================================================
-t_rayparams setup180(t_mlxdata *data, int angle)
+static void setup180(t_mlxdata *data, t_rayparams *ray)
 {
-	t_rayparams ray;
-	long		first_hit;  // temporary variable
+	double		first_hit;
 
-	angle = 180 - angle;
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with horizontal lines
-	//-----------------------------------------------------------------
-	ray.horizontal_y = (data->playerpos.y & 0xffc0) - 1;
-	first_hit = (long)(data->tab_div_128tan[angle] * 2); // 256/tan(angle)
-	first_hit *= (long)(ray.horizontal_y - data->playerpos.y);
-	first_hit >>= 8;
-	first_hit += (long)data->playerpos.x;
-	ray.horizontal_x = (short)first_hit;
-	printf("ray.horizontal = (%i, %i)\n", ray.horizontal_x, ray.horizontal_y);
-	ray.horizontal_stepx = -(data->tab_div_128tan[angle] / 2.);  // 64/tan(angle)
-	ray.horizontal_stepy = -64;
-	printf(" + ray.horizontal_step = (%i, %i)\n", ray.horizontal_stepx, ray.horizontal_stepy);
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with vertical lines
-	//-----------------------------------------------------------------
-	ray.vertical_x  = (data->playerpos.x & 0xffc0) - 1;
-	first_hit   = (long)(data->tab_128tan[angle] * 2); // 256*tan(angle)
-	first_hit  *= (long)(ray.vertical_x - data->playerpos.x);
-	first_hit   >>= 8;
-	first_hit  += (long)data->playerpos.y;
-	ray.vertical_y = (short)first_hit;
-	printf("ray.vertical = (%i, %i)\n", ray.vertical_x, ray.vertical_y);
-	ray.vertical_stepx = -64;
-	ray.vertical_stepy = -(data->tab_128tan[angle] / 2.);  // 64*tan(angle)
-	printf(" + ray.vertical_step = (%i, %i)\n", ray.vertical_stepx, ray.vertical_stepy);
-	return (ray);
+	ray->horizontal_y = ((int)data->playerpos.y & 0xffc0) - 0.01;
+	first_hit = -256. / tan(ray->angle * PI / 180);
+	first_hit *= (double)(ray->horizontal_y - data->playerpos.y);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.x;
+	ray->horizontal_x = (double)first_hit;
+	ray->horizontal_stepx = 64 / tan(ray->angle * PI / 180);
+	ray->horizontal_stepy = -64;
+	ray->vertical_x = ((int)data->playerpos.x & 0xffc0) - 0.01;
+	first_hit = -256. * tan(ray->angle * PI / 180);
+	first_hit *= (double)(ray->vertical_x - data->playerpos.x);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.y;
+	ray->vertical_y = (double)first_hit;
+	ray->vertical_stepx = -64;
+	ray->vertical_stepy = 64 * tan(ray->angle * PI / 180);
 }
 
-//=====================================================================
-// angle 180 to 270 degrees - parameter setup ...
-//=====================================================================
-t_rayparams setup270(t_mlxdata *data, int angle)
+static void setup270(t_mlxdata *data, t_rayparams *ray)
 {
-	t_rayparams ray;
-	long		first_hit;  // temporary variable
+	double		first_hit;
 
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with horizontal lines
-	//-----------------------------------------------------------------
-	angle = angle - 180;
-	ray.horizontal_y = (data->playerpos.y & 0xffc0) + 64;
-	first_hit = (long)(data->tab_div_128tan[angle] * 2); // 256/tan(angle)
-	first_hit *= -(long)(ray.horizontal_y - data->playerpos.y);
-	first_hit >>= 8;
-	first_hit += (long)data->playerpos.x;
-	ray.horizontal_x = (short)first_hit;
-	printf("ray.horizontal = (%i, %i)\n", ray.horizontal_x, ray.horizontal_y);
-	ray.horizontal_stepx = -(data->tab_div_128tan[angle] / 2.);  // 64/tan(angle)
-	ray.horizontal_stepy = 64;
-	printf(" + ray.horizontal_step = (%i, %i)\n", ray.horizontal_stepx, ray.horizontal_stepy);
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with vertical lines
-	//-----------------------------------------------------------------
-	ray.vertical_x  = (data->playerpos.x & 0xffc0) - 1;
-	first_hit   = (long)(data->tab_128tan[angle] * 2); // 256*tan(angle)
-	first_hit  *= -(long)(ray.vertical_x - data->playerpos.x);
-	first_hit   >>= 8;
-	first_hit  += (long)data->playerpos.y;
-	ray.vertical_y = (short)first_hit;
-	printf("ray.vertical = (%i, %i)\n", ray.vertical_x, ray.vertical_y);
-	ray.vertical_stepx = -64;
-	ray.vertical_stepy = (data->tab_128tan[angle] / 2.); // 64*tan(angle)
-	printf(" + ray.vertical_step = (%i, %i)\n", ray.vertical_stepx, ray.vertical_stepy);
-	return (ray);
+	ray->horizontal_y = ((int)data->playerpos.y & 0xffc0) + 64;
+	first_hit = 256. / tan(ray->angle * PI / 180);
+	first_hit *= -(double)(ray->horizontal_y - data->playerpos.y);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.x;
+	ray->horizontal_x = (double)first_hit;
+	ray->horizontal_stepx = -64 / tan(ray->angle * PI / 180);
+	ray->horizontal_stepy = 64;
+	ray->vertical_x = ((int)data->playerpos.x & 0xffc0) - 0.01;
+	first_hit = 256 * tan(ray->angle * PI / 180);
+	first_hit *= -(double)(ray->vertical_x - data->playerpos.x);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.y;
+	ray->vertical_y = (double)first_hit;
+	ray->vertical_stepx = -64;
+	ray->vertical_stepy = 64 * tan(ray->angle * PI / 180);
 }
 
-//=====================================================================
-// angle 270 to 360 degrees - parameter setup ...
-//=====================================================================
-t_rayparams setup360(t_mlxdata *data, int angle)
+static void setup360(t_mlxdata *data, t_rayparams *ray)
 {
-	t_rayparams ray;
-	long		first_hit;  // temporary variable
+	double		first_hit;
 
-	angle = 360 - angle;
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with horizontal lines
-	//-----------------------------------------------------------------
-	ray.horizontal_y = (data->playerpos.y & 0xffc0) + 64;
-	first_hit = (long)(data->tab_div_128tan[angle] * 2); // 256/tan(angle)
-	first_hit *= (long)(ray.horizontal_y - data->playerpos.y);
-	first_hit >>= 8;
-	first_hit += (long)data->playerpos.x;
-	ray.horizontal_x = (short)first_hit;
-	printf("ray.horizontal = (%i, %i)\n", ray.horizontal_x, ray.horizontal_y);
-	ray.horizontal_stepx = (data->tab_div_128tan[angle] / 2.);  // 64/tan(angle)
-	ray.horizontal_stepy = 64;
-	printf(" + ray.horizontal_step = (%i, %i)\n", ray.horizontal_stepx, ray.horizontal_stepy);
-	//-----------------------------------------------------------------
-	// setup parameters for intersections with vertical lines
-	//-----------------------------------------------------------------
-	ray.vertical_x  = (data->playerpos.x & 0xffc0) + 64;
-	first_hit   = (long)(data->tab_128tan[angle] * 2); // 256*tan(angle)
-	first_hit  *= (long)(ray.vertical_x - data->playerpos.x);
-	first_hit   >>= 8;
-	first_hit  += (long)data->playerpos.y;
-	ray.vertical_y = (short)first_hit;
-	printf("ray.vertical = (%i, %i)\n", ray.vertical_x, ray.vertical_y);
-	ray.vertical_stepx = 64;
-	ray.vertical_stepy = (data->tab_128tan[angle] / 2.);  // 64*tan(angle)
-	printf(" + ray.vertical_step = (%i, %i)\n", ray.vertical_stepx, ray.vertical_stepy);
-	return (ray);
+	ray->horizontal_y = ((int)data->playerpos.y & 0xffc0) + 64;
+	first_hit = 256. / tan(ray->angle * PI / 180);
+	first_hit *= -(double)(ray->horizontal_y - data->playerpos.y);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.x;
+	ray->horizontal_x = (double)first_hit;
+	ray->horizontal_stepx = -64 / tan(ray->angle * PI / 180);
+	ray->horizontal_stepy = 64;
+	ray->vertical_x = ((int)data->playerpos.x & 0xffc0) + 64;
+	first_hit = 256 * tan(ray->angle * PI / 180);
+	first_hit *= -(double)(ray->vertical_x - data->playerpos.x);
+	first_hit /= 256;
+	first_hit += (double)data->playerpos.y;
+	ray->vertical_y = (double)first_hit;
+	ray->vertical_stepx = 64;
+	ray->vertical_stepy = -64 * tan(ray->angle * PI / 180);
 }
 
-t_rayparams	setup_intersections_params(t_mlxdata *data, int angle)
+void		setup_intersections_params(t_mlxdata *data, t_rayparams *ray)
 {
-	t_rayparams nul;
-
-	if (angle < 90)
-		return (setup90(data, angle));
-	else if (angle <= 180)
-		return (setup180(data, angle));
-	else if (angle < 270)
-		return (setup270(data, angle));
-	else if (angle <= 360)
-		return (setup360(data, angle));
-	printf("\n\n\n\n\n\n\n\n\nFUCK YOU IL A DIT\n\n\n\n\n\n\n\n");
-	return (nul);
+	if (ray->angle <= 90)
+		setup90(data, ray);
+	else if (ray->angle <= 180)
+		setup180(data, ray);
+	else if (ray->angle <= 270)
+		setup270(data, ray);
+	else if (ray->angle <= 360)
+		setup360(data, ray);
 }

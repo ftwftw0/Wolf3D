@@ -6,7 +6,7 @@
 /*   By: flagoutt <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/09 13:14:33 by flagoutt          #+#    #+#             */
-/*   Updated: 2015/01/27 04:36:17 by flagoutt         ###   ########.fr       */
+/*   Updated: 2015/06/08 13:34:46 by flagoutt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,8 @@ void	set_color(t_mlxdata *data, int i, int j, int isline)
 
 int		mlx_putlines(t_mlxdata *data, t_grid *grid)
 {
-	int		j;
-	int		i;
+	int			j;
+	int			i;
 	t_ipoint	pos;
 
 	i = 0;
@@ -71,10 +71,10 @@ int		mlx_putlines(t_mlxdata *data, t_grid *grid)
 
 int		mlx_putcolumns(t_mlxdata *data, t_grid *grid)
 {
-	int		i;
-	int		j;
-	int		nb;
-	t_ipoint pos;
+	int			i;
+	int			j;
+	int			nb;
+	t_ipoint	pos;
 
 	j = 0;
 	nb = grid->table[0][0];

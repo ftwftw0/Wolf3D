@@ -6,7 +6,7 @@
 #    By: flagoutt <marvin@42.fr>                    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2014/11/03 16:32:10 by flagoutt          #+#    #+#              #
-#    Updated: 2015/05/27 14:53:07 by flagoutt         ###   ########.fr        #
+#    Updated: 2015/06/08 13:21:57 by flagoutt         ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -21,11 +21,17 @@ SRCS = srcs/ft_init.c \
 		srcs/mlx_hooks.c \
 		srcs/wolf_show.c \
 		srcs/wolf_raycast.c \
-		srcs/mlx_img_cpy.c \
+		srcs/wolf_raycast_horiz.c \
+		srcs/wolf_raycast_verti.c \
 		srcs/setup_intersections_params.c \
-		srcs/wolf_move.c
+		srcs/wolf_move.c \
+		srcs/maptextures.c \
+		srcs/load_txtures.c \
+		srcs/wolf_putweapon.c \
+		srcs/gettextures.c \
+		srcs/wolf_controller.c
 SRCO = $(SRCS:.c=.o)
-INCLUDE = -Iincludes/ -Ilibft/
+INCLUDE = -Iincludes/ -Ilibft/ -Iminilibx/
 LIBS = -Lminilibx -lmlx -framework OpenGL -framework AppKit -Llibft/ -lft -lm
 NAME = Wolf3D
 

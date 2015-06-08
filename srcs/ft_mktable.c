@@ -6,7 +6,7 @@
 /*   By: flagoutt <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2014/12/08 13:16:04 by flagoutt          #+#    #+#             */
-/*   Updated: 2015/05/27 11:39:42 by flagoutt         ###   ########.fr       */
+/*   Updated: 2015/06/03 00:19:45 by flagoutt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,25 +18,26 @@ t_grid	*ft_mktable(char *path)
 	t_grid	*grid;
 	char	*str;
 	int		fd;
-	int		i;
 	int		**tmp;
-	int		ret;
 
-	fd = open(path, O_RDONLY, S_IREAD);
-	i = 0;
-	grid = (t_grid*)malloc(sizeof(t_grid));
-	while ((ret = get_next_line(fd, &str)) >= 0)
+	if ((fd = open(path, O_RDONLY, S_IREAD)) == -1 ||
+		!(grid = (t_grid *)malloc(sizeof(t_grid))))
+	{
+		ft_putendl_fd("Bad map.", 2);
+		return (NULL);
+	}
+	grid->columns = 0;
+	while (get_next_line(fd, &str) >= 0)
 	{
 		tmp = grid->table;
-		grid->table = (int **)malloc(sizeof(int*) * (i + 1));
-		ft_memcpy(grid->table, tmp, sizeof(int*) * i);
-		grid->table[i] = ft_createline(str);
+		grid->table = (int **)malloc(sizeof(int*) * (grid->columns + 1));
+		ft_memcpy(grid->table, tmp, sizeof(int*) * grid->columns);
+		grid->table[grid->columns] = ft_createline(str);
 		free(str);
-		i++;
+		grid->columns++;
 	}
-	while (grid->table[i - 1] == NULL)
-		i--;
-	grid->columns = i;
+	while (grid->table[grid->columns - 1] == NULL)
+		grid->columns--;
 	close(fd);
 	return (grid);
 }
