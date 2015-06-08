@@ -6,7 +6,7 @@
 /*   By: flagoutt <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2015/06/02 20:01:25 by flagoutt          #+#    #+#             */
-/*   Updated: 2015/06/08 13:25:12 by flagoutt         ###   ########.fr       */
+/*   Updated: 2015/06/08 17:50:10 by flagoutt         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,16 @@
 # include <unistd.h>
 # include <stdio.h>
 # include <sys/time.h>
+
 /*
 **  Common parameters
 */
-# define FOV 70.
+# define FOV 60.
 # define BLOCKSIZE 64.
 # define MAX_DISTANCE 100000
 # define WALL_HEIGHT 20
 # define JUMP_HEIGHT 50
+
 /*
 **  In game Colors
 */
@@ -38,6 +40,7 @@
 # define WALLEASTCOLOR 0x00ccff33
 # define WALLWESTCOLOR 0x0000ffcc
 # define FLOORCOLOR 0x0005870
+
 /*
 **	Define your own keys
 */
@@ -55,6 +58,7 @@
 # define TURNLEFT 0
 # define TURNRIGHT 2
 # define KEY_T 17
+
 /*
 **  In game movement speeds
 */
@@ -62,9 +66,9 @@
 # define ROTSPEED 2
 
 /*
-** Ajout des booleens, substitue par des chars
+** Ajout des t_booleens, substitue par des chars
 */
-typedef char	bool;
+typedef char	t_bool;
 
 /*
 ** Points x, y + couleur.
@@ -108,17 +112,17 @@ typedef struct		s_grid
 */
 typedef struct		s_hooks
 {
-	bool			textured;
-	bool			shooting;
-	bool			powering;
-	bool			forward;
-	bool			backward;
-	bool			strafeleft;
-	bool			straferight;
-	bool			camleft;
-	bool			camright;
-	bool			crouch;
-	bool			jumping;
+	t_bool			textured;
+	t_bool			shooting;
+	t_bool			powering;
+	t_bool			forward;
+	t_bool			backward;
+	t_bool			strafeleft;
+	t_bool			straferight;
+	t_bool			camleft;
+	t_bool			camright;
+	t_bool			crouch;
+	t_bool			jumping;
 }					t_hooks;
 
 /*
@@ -168,27 +172,27 @@ typedef struct		s_minimap
 */
 typedef struct		s_rayparams
 {
-	double	angle;
-    double  horizontal_x;
-    double  horizontal_y;
-    double  horizontal_stepx;
-    double  horizontal_stepy;
-    double  horizontal_hit_dist;
-    double  horizontal_object_x;
-    double  horizontal_object_dist;
-    double  vertical_x;
-    double  vertical_y;
-    double  vertical_stepx;
-    double  vertical_stepy;
-    double  vertical_hit_dist;
-    double  vertical_object_y;
-    double  vertical_object_dist;
-	double	wallheight;
-	double	objheight;
-	int		walloffset;
-	int		objoffset;
-	int		blocktype;
-	int		objectype;
+	double			angle;
+	double			horizontal_x;
+	double			horizontal_y;
+	double			horizontal_stepx;
+	double			horizontal_stepy;
+	double			horizontal_hit_dist;
+	double			horizontal_object_x;
+	double			horizontal_object_dist;
+	double			vertical_x;
+	double			vertical_y;
+	double			vertical_stepx;
+	double			vertical_stepy;
+	double			vertical_hit_dist;
+	double			vertical_object_y;
+	double			vertical_object_dist;
+	double			wallheight;
+	double			objheight;
+	int				walloffset;
+	int				objoffset;
+	int				blocktype;
+	int				objectype;
 }					t_rayparams;
 
 /*
@@ -215,7 +219,7 @@ typedef struct		s_mlxdata
 	int				skycolor;
 	int				floorcolor;
 	t_textures		txtures;
-}			t_mlxdata;
+}					t_mlxdata;
 
 int					mlx_putline(t_mlxdata *data, t_ipoint a, t_ipoint b);
 void				swap_points(t_ipoint *a, t_ipoint *b);
@@ -232,18 +236,18 @@ void				ft_puttab(t_grid *grid);
 int					mlx_putgrid(t_mlxdata *data, t_grid *grid);
 int					mlx_cleanwindow(t_mlxdata *data);
 t_img				mlx_create_image(t_mlxdata *data,
-									int xsize,
-									int ysize,
-									int bpp);
+								int xsize, int ysize, int bpp);
 int					mlx_putpxl_img(t_img img, int x, int y, int color);
-int		            wolf_view(t_mlxdata *data);
+int					wolf_view(t_mlxdata *data);
 int					wolf_move(t_mlxdata *data, int direction);
 int					mlx_getpxl_img(int x, int y, t_img img);
-void				setup_intersections_params(t_mlxdata *data, t_rayparams *ray);
-double				walldist(t_mlxdata *data, t_rayparams *ray, int *horizcloser);
-int				    verti_walldist(t_mlxdata *data, t_rayparams *ray,
+void				setup_intersections_params(t_mlxdata *data,
+								t_rayparams *ray);
+double				walldist(t_mlxdata *data, t_rayparams *ray,
+								int *horizcloser);
+int					verti_walldist(t_mlxdata *data, t_rayparams *ray,
 								int *vobjectype);
-int			       horiz_walldist(t_mlxdata *data, t_rayparams *ray,
+int					horiz_walldist(t_mlxdata *data, t_rayparams *ray,
 								int *hobjectype);
 int					load_txtures(t_mlxdata *data);
 int					mlx_getpxl_img(int x, int y, t_img img);
@@ -251,6 +255,4 @@ void				textured(t_mlxdata *data, int x, t_rayparams *ray);
 int					wolf_putweapon(t_mlxdata *data);
 int					wolf_controller(t_mlxdata *data);
 t_img				gettextures(t_mlxdata *data, int type);
-
-
 #endif
