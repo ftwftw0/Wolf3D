@@ -19,7 +19,8 @@ Technologies used :
 - MinilibX (an unofficial graphical library only containing a function to put a colored point into it's window)
 - Pythagore
 
-Here's a preview :
+
+[![Wolf3D](http://img.youtube.com/vi/R2I-d-OoQk0/0.jpg)](https://youtu.be/R2I-d-OoQk0 "Wolf3D")
 
 
 PS : In this video sometimes the screen's reducing by itself. Don't worry it's not a bug, only a shortcut on MacOS (Ctrl + UpArrow) that shows and reduce all your opened apps. Yes, i used Ctrl to shoot. Don't blame me im lefty!
