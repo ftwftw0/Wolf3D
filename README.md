@@ -3,7 +3,7 @@ Environment : MacOS - Yosemite
 
 This is a Wold3D-like game that uses my Raycasting engine.
 
-Raycasting is an old technic often known for being the first one used to make first-person shooters, like Wolfeinstein3D and DukeNukem3D for example.
+Raycasting is an old technic often known for being the first one used to make first-person shooters, like Wolfenstein3D and DukeNukem3D for example.
 
 Raycasting is the fact of sending a ray in a direction to detect an intersection/collision into this direction, and it's distance.
 In fact, maps are simple grids rather than polygon meshes, that's why it's not real 3D, it's kind of a fake but you get the immersion of a 3D environment without many of the complexities of "real 3D" to slow you down.
