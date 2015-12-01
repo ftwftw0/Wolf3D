@@ -22,5 +22,6 @@ Technologies used :
 Here's a preview :
 
 
-PS : In the video sometimes the screen's reducing by itself. Don't worry it's not a bug, only a shortcut on MacOS (Ctrl + UpArrow) that shows and reduce all your opened apps. Yes, i used Ctrl to shoot. Don't blame me im lefty!
+PS : In this video sometimes the screen's reducing by itself. Don't worry it's not a bug, only a shortcut on MacOS (Ctrl + UpArrow) that shows and reduce all your opened apps. Yes, i used Ctrl to shoot. Don't blame me im lefty!
+
 (Won't work on Linux, this version of MinilibX -the unofficial graphical library that i used- is only for MacOS)
